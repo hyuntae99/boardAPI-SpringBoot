@@ -28,9 +28,10 @@
 
 <body>
 <div class="layout">
-  <form th:action="@{/board/update/{id}(id=${board.id})}" method="post">
+  <form th:action="@{/board/update/{id}(id=${board.id})}" method="post" enctype="multipart/form-data">
     <input name = "title" type="text" th:value="${board.title}"> <!-- 원래 있던 제목 -->
     <textarea name="content" th:text="${board.content}"></textarea> <!-- 원래 있던 내용 -->
+    <input type="file" name="file">  <!-- 파일 -->
     <button type="submit">수정</button> <!-- 수정 후 제출 -->
   </form>
 

@@ -3,6 +3,7 @@ package com.study.boardAPI.Service;
 import com.study.boardAPI.entity.Board;
 import com.study.boardAPI.repository.BoardRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -15,32 +16,45 @@ import java.util.UUID;
 @Service
 public class BoardService {
 
-    @Autowired // 스프링 빈이 알아서 읽어옴 (의존성 주입)
+    @Autowired
     private BoardRepository boardRepository;
 
-    // 글 작성 처리
+    @Autowired
+    private ResourceLoader resourceLoader;
+
     public void write(Board board, MultipartFile file) throws Exception {
-
-        // 프로젝트의 경로 (boardAPI 까지) + src.main.resources.static.file
-        String projectPath = System.getProperty("user.dir") + "\\src\\main\\resources\\static\\files";
-
-        // UUID = 식별자
-        UUID uuid = UUID.randomUUID();
+        // 파일 저장 경로
+        String uploadDir = "files";
 
         // 랜덤 식별자_원래 파일 이름
-        String fileName = uuid + "_" + file.getOriginalFilename();
+        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
 
-        // 파일을 아래 경로에 넣고 파일 이름은 fileName
-        File saveFile = new File(projectPath, fileName);
+        // 파일 저장 경로 가져오기
+        String projectPath = resourceLoader.getResource("classpath:static").getFile().getAbsolutePath();
+        String saveFilePath = projectPath + File.separator + uploadDir;
 
+        // 파일 저장 디렉토리 생성
+        File uploadPath = new File(saveFilePath);
+        if (!uploadPath.exists()) {
+            uploadPath.mkdirs();
+        }
+
+        // 파일 저장
+        File saveFile = new File(uploadPath, fileName);
         file.transferTo(saveFile);
 
-        // Entity에 이름과 경로 저장 -> DB에 저장됨
-        board.setFilename(fileName);
-        board.setFilepath("/files/" + fileName);
+        if (file.isEmpty()) {
+            board.setFilename(null);
+            board.setFilepath(null);
+        } else {
+            // Entity에 이름과 경로 저장 -> DB에 저장됨
+            board.setFilename(fileName);
+            board.setFilepath("/" + uploadDir + "/" + fileName);
+        }
 
         boardRepository.save(board); // entity 저장
     }
+
 
     // 게시글 리스트 처리
     public Page<Board> boardList(Pageable pageable) {

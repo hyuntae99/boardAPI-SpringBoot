@@ -119,8 +119,13 @@ public class BoardController {
         Board boardTemp =boardService.boardView(id); // id에 해당하는 기존 글 불러오기
         boardTemp.setTitle(board.getTitle()); // title 덮어쓰기
         boardTemp.setContent(board.getContent()); // content 덮어쓰기
+        if (file != null && !file.isEmpty()) {
+            String fileName = file.getOriginalFilename();
+            boardTemp.setFilename(fileName);
+            boardTemp.setFilepath("/files/" + fileName);
+        }
 
-        boardService.write(boardTemp, file); // 새로운 글(수정 글)을 덮어쓰기
+        boardService.write(board, file);
 
         model.addAttribute("message", "글 수정이 완료되었습니다.");
         model.addAttribute("searchUrl", "/board/list");
