@@ -2,39 +2,42 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>게시물 작성 폼</title> <!-- 웹사이트 이름 -->
+  <title>게시물 수정 폼</title>
 </head>
 
-<!-- css -->
 <style>
     .layout {
-        width : 500px;
-        margin : 0 auto;
-        margin-top : 40px;
+        width: 500px;
+        margin: 0 auto;
+        margin-top: 40px;
     }
 
     .layout input {
-        width : 100%;
-        box-sizing : border-box
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .layout textarea {
-        width : 100%;
-        margin-top : 10px;
-        min-height : 300px;
+        width: 100%;
+        margin-top: 10px;
+        min-height: 300px;
     }
-
 </style>
 
 <body>
 <div class="layout">
   <form th:action="@{/board/update/{id}(id=${board.id})}" method="post" enctype="multipart/form-data">
-    <input name = "title" type="text" th:value="${board.title}"> <!-- 원래 있던 제목 -->
-    <textarea name="content" th:text="${board.content}"></textarea> <!-- 원래 있던 내용 -->
-    <input type="file" name="file">  <!-- 파일 -->
-    <button type="submit">수정</button> <!-- 수정 후 제출 -->
+    <input name="title" type="text" th:value="${board.title}">
+    <textarea name="content" th:text="${board.content}"></textarea>
+    <input type="hidden" name="existingFile" th:value="${board.filename}">
+    <div th:if="${board.filename != null}">
+      <p>기존 파일:</p>
+      <p th:text="${board.filename}"></p>
+    </div>
+    <input type="file" name="file">
+    <button type="submit">수정</button>
   </form>
-
 </div>
 </body>
+
 </html>
